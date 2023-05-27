@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /**
  * Import function triggers from their respective submodules:
  *
@@ -20,92 +21,95 @@ const logger = require("firebase-functions/logger");
 
 const functions = require("firebase-functions");
 
-var admin = require("firebase-admin");
+const admin = require("firebase-admin");
 
-var serviceAccount = require("./serviceAccountKey.json");
+const serviceAccount = require("./serviceAccountKey.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://musicapp-f7c73-default-rtdb.asia-southeast1.firebasedatabase.app"
+  databaseURL: "https://musicapp-f7c73-default-rtdb.asia-southeast1.firebasedatabase.app",
 });
 
 const express = require("express");
 const cors = require("cors");
-const { response } = require("express");
 
-// Main API 
+// Main API
 const app = express();
 app.use(cors({origin: true}));
 
-// Database 
+// Database
 const db = admin.firestore();
 
 // Routes
-app.get("/",(reg, res)=>{
+app.get("/", (reg, res)=>{
   return res.status(200).send("Hello firebase API");
 });
 
+// user-------------------------------------------------------------- --------------------
 // create -> post()
-app.post("/api/create",(reg, res)=>{
+app.post("/api/create", (reg, res)=>{
   (async () => {
     try {
       await db.collection("userDetails").doc(`/${Date.now()}/`).create({
         id: Date.now(),
-        id: doc.data().id,
         name: reg.body.name,
         mobile: reg.body.mobile,
         address: reg.body.address,
+        email: reg.body.email,
+        bio: reg.body.bio,
       });
-      return res.status(200).send({ status:"sucess", msg:"Data Saved" });
+      return res.status(200).send({status: "sucess", msg: "Data Saved"});
     } catch (error) {
       console.log(error);
-      return res.status(500).send({ status:"False", msg:error });
+      return res.status(500).send({status: "False", msg: error});
     }
   })();
 });
 // get -> get()
-app.get("/api/get/:id",(reg, res)=>{
+app.get("/api/get/:id", (reg, res)=>{
   (async () => {
     try {
       const reqDoc = db.collection("userDetails").doc(reg.params.id);
-      let userDetail = await reqDoc.get();
-      let response = userDetail.data();
-      return res.status(200).send({ status:"sucess", data: response });
+      const userDetail = await reqDoc.get();
+      const response = userDetail.data();
+      return res.status(200).send({status: "sucess", data: response});
     } catch (error) {
       console.log(error);
-      return res.status(500).send({ status:"False", msg:error });
+      return res.status(500).send({status: "False", msg: error});
     }
   })();
 });
 
-app.get("/api/getALL",(reg, res)=>{
+app.get("/api/getALL", (reg, res)=>{
   (async () => {
     try {
       const query = db.collection("userDetails");
-      let response = [];
+      const response = [];
       await query.get().then((data)=>{
-        let docs = data.docs;
-        docs.map(doc => {
+        const docs = data.docs;
+        docs.map( (doc) => {
           const selectionItem ={
             id: doc.data().id,
             name: doc.data().name,
             mobile: doc.data().mobile,
             address: doc.data().address,
+            email: doc.data().email,
+            bio: doc.data().bio,
           };
 
           response.push(selectionItem);
         });
         return response;
-     });
-      return res.status(200).send({ status:"sucess", data: response });
+      });
+      return res.status(200).send({status: "sucess", data: response});
     } catch (error) {
       console.log(error);
-      return res.status(500).send({ status:"False", msg:error });
+      return res.status(500).send({status: "False", msg: error});
     }
   })();
 });
-//update -> put()
-app.put("/api/update/:id",(reg, res)=>{
+// update -> put()
+app.put("/api/update/:id", (reg, res)=>{
   (async () => {
     try {
       const reqDoc = db.collection("userDetails").doc(reg.params.id);
@@ -113,27 +117,132 @@ app.put("/api/update/:id",(reg, res)=>{
         name: reg.body.name,
         mobile: reg.body.mobile,
         address: reg.body.address,
+        email: reg.body.email,
+        bio: reg.body.bio,
       });
-      return res.status(200).send({ status:"sucess", msg:"Data Update" });
+      return res.status(200).send({status: "sucess", msg: "Data Update"});
     } catch (error) {
       console.log(error);
-      return res.status(500).send({ status:"False", msg:error });
+      return res.status(500).send({status: "False", msg: error});
     }
   })();
 });
-//delete -> delete()
-app.delete("/api/delete/:id",(reg, res)=>{
+// delete -> delete()
+app.delete("/api/delete/:id", (reg, res)=>{
   (async () => {
     try {
       const reqDoc = db.collection("userDetails").doc(reg.params.id);
       await reqDoc.delete();
-      return res.status(200).send({ status:"sucess", msg:"Data Delete" });
+      return res.status(200).send({status: "sucess", msg: "Data Delete"});
     } catch (error) {
       console.log(error);
-      return res.status(500).send({ status:"False", msg:error });
+      return res.status(500).send({status: "False", msg: error});
     }
   })();
 });
-//export data the api to firebase cloud functions
 
-exports.app  = functions.https.onRequest(app); 
+
+// Music -> Music
+app.get("/music", (reg, res)=>{
+  return res.status(200).send("Hello Music");
+});
+app.post("/api/music/create", (reg, res)=>{
+  (async () => {
+    try {
+      await db.collection("music").doc(`/${Date.now()}/`).create({
+        idSong: Date.now(),
+        idCategory: reg.body.idCategory,
+        idAlbum: reg.body.idAlbum,
+        nameSong: reg.body.nameSong,
+        linkImg: reg.body.linkImg,
+        idSinger: reg.body.idSinger,
+        linkSong: reg.body.linkSong,
+      });
+      return res.status(200).send({status: "sucess", msg: "Data Saved Music"});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+// get -> get()
+app.get("/api/music/get/:id", (reg, res)=>{
+  (async () => {
+    try {
+      const reqDoc = db.collection("music").doc(reg.params.id);
+      const userDetail = await reqDoc.get();
+      const response = userDetail.data();
+      return res.status(200).send({status: "sucess", data: response});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+app.get("/api/music/getALL", (reg, res)=>{
+  (async () => {
+    try {
+      const query = db.collection("music");
+      const response = [];
+      await query.get().then((data)=>{
+        const docs = data.docs;
+        docs.map( (doc) => {
+          const selectionItem ={
+            idSong: doc.data().idSong,
+            idCategory: doc.data().idCategory,
+            idAlbum: doc.data().idAlbum,
+            nameSong: doc.data().nameSong,
+            linkImg: doc.data().linkImg,
+            idSinger: doc.data().idSinger,
+            linkSong: doc.data().linkSong,
+          };
+
+          response.push(selectionItem);
+        });
+        return response;
+      });
+      return res.status(200).send({status: "sucess", data: response});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+// update -> put()
+app.put("/api/music/update/:id", (reg, res)=>{
+  (async () => {
+    try {
+      const reqDoc = db.collection("music").doc(reg.params.id);
+      await reqDoc.update({
+        idCategory: reg.body.idCategory,
+        idAlbum: reg.body.idAlbum,
+        nameSong: reg.body.nameSong,
+        linkImg: reg.body.linkImg,
+        idSinger: reg.body.idSinger,
+        linkSong: reg.body.linkSong,
+      });
+      return res.status(200).send({status: "sucess", msg: "Music Data Update"});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+// delete -> delete()
+app.delete("/api/music/delete/:id", (reg, res)=>{
+  (async () => {
+    try {
+      const reqDoc = db.collection("music").doc(reg.params.id);
+      await reqDoc.delete();
+      return res.status(200).send({status: "sucess", msg: "Data Delete"});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+// export data the api to firebase cloud functions
+exports.app = functions.https.onRequest(app);
