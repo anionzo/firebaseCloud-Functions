@@ -5,3 +5,7 @@ The linebreaks (new lines) used in windows operating system are usually carriage
 
 Many versioning systems (like git and subversion) can automatically ensure the correct ending. However to cover all contingencies, you can activate this rule.</br>
 #fix lỗi :npx eslint --fix file.js
+
+#dua len du lieu 
+</br>
+firebase deploy 

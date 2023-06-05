@@ -41,13 +41,13 @@ app.use(cors({origin: true}));
 const db = admin.firestore();
 
 // Routes
-app.get("/", (reg, res)=>{
+app.get("/", (reg, res) => {
   return res.status(200).send("Hello firebase API");
 });
 
 // user-------------------------------------------------------------- --------------------
 // create -> post()
-app.post("/api/create", (reg, res)=>{
+app.post("/api/create", (reg, res) => {
   (async () => {
     try {
       await db.collection("userDetails").doc(`/${Date.now()}/`).create({
@@ -66,7 +66,7 @@ app.post("/api/create", (reg, res)=>{
   })();
 });
 // get -> get()
-app.get("/api/get/:id", (reg, res)=>{
+app.get("/api/get/:id", (reg, res) => {
   (async () => {
     try {
       const reqDoc = db.collection("userDetails").doc(reg.params.id);
@@ -80,15 +80,15 @@ app.get("/api/get/:id", (reg, res)=>{
   })();
 });
 
-app.get("/api/getALL", (reg, res)=>{
+app.get("/api/getALL", (reg, res) => {
   (async () => {
     try {
       const query = db.collection("userDetails");
       const response = [];
-      await query.get().then((data)=>{
+      await query.get().then((data) => {
         const docs = data.docs;
-        docs.map( (doc) => {
-          const selectionItem ={
+        docs.map((doc) => {
+          const selectionItem = {
             id: doc.data().id,
             name: doc.data().name,
             mobile: doc.data().mobile,
@@ -109,7 +109,7 @@ app.get("/api/getALL", (reg, res)=>{
   })();
 });
 // update -> put()
-app.put("/api/update/:id", (reg, res)=>{
+app.put("/api/update/:id", (reg, res) => {
   (async () => {
     try {
       const reqDoc = db.collection("userDetails").doc(reg.params.id);
@@ -128,7 +128,7 @@ app.put("/api/update/:id", (reg, res)=>{
   })();
 });
 // delete -> delete()
-app.delete("/api/delete/:id", (reg, res)=>{
+app.delete("/api/delete/:id", (reg, res) => {
   (async () => {
     try {
       const reqDoc = db.collection("userDetails").doc(reg.params.id);
@@ -143,10 +143,10 @@ app.delete("/api/delete/:id", (reg, res)=>{
 
 
 // Music -> Music
-app.get("/music", (reg, res)=>{
+app.get("/music", (reg, res) => {
   return res.status(200).send("Hello Music");
 });
-app.post("/api/music/create", (reg, res)=>{
+app.post("/api/music/create", (reg, res) => {
   (async () => {
     try {
       await db.collection("music").doc(`/${Date.now()}/`).create({
@@ -167,7 +167,7 @@ app.post("/api/music/create", (reg, res)=>{
 });
 
 // get -> get()
-app.get("/api/music/get/:id", (reg, res)=>{
+app.get("/api/music/get/:id", (reg, res) => {
   (async () => {
     try {
       const reqDoc = db.collection("music").doc(reg.params.id);
@@ -181,15 +181,15 @@ app.get("/api/music/get/:id", (reg, res)=>{
   })();
 });
 
-app.get("/api/music/getALL", (reg, res)=>{
+app.get("/api/music/getALL", (reg, res) => {
   (async () => {
     try {
       const query = db.collection("music");
       const response = [];
-      await query.get().then((data)=>{
+      await query.get().then((data) => {
         const docs = data.docs;
-        docs.map( (doc) => {
-          const selectionItem ={
+        docs.map((doc) => {
+          const selectionItem = {
             idSong: doc.data().idSong,
             idCategory: doc.data().idCategory,
             idAlbum: doc.data().idAlbum,
@@ -212,7 +212,7 @@ app.get("/api/music/getALL", (reg, res)=>{
 });
 
 // update -> put()
-app.put("/api/music/update/:id", (reg, res)=>{
+app.put("/api/music/update/:id", (reg, res) => {
   (async () => {
     try {
       const reqDoc = db.collection("music").doc(reg.params.id);
@@ -232,10 +232,472 @@ app.put("/api/music/update/:id", (reg, res)=>{
   })();
 });
 // delete -> delete()
-app.delete("/api/music/delete/:id", (reg, res)=>{
+app.delete("/api/music/delete/:id", (reg, res) => {
   (async () => {
     try {
       const reqDoc = db.collection("music").doc(reg.params.id);
+      await reqDoc.delete();
+      return res.status(200).send({status: "sucess", msg: "Data Delete"});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+// ----------------------------------------------------------------
+// Alunm
+app.get("/album", (reg, res) => {
+  return res.status(200).send("Hello Album");
+});
+app.post("/api/album/create", (reg, res) => {
+  (async () => {
+    try {
+      await db.collection("album").doc(`/${Date.now()}/`).create({
+        idAlbum: Date.now(),
+        nameAlbum: reg.body.nameAlbum,
+        ImgAlbum: reg.body.ImgAlbum,
+      });
+      return res.status(200).send({status: "sucess", msg: "Data Saved Album"});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+// get -> get()
+app.get("/api/album/get/:id", (reg, res) => {
+  (async () => {
+    try {
+      const reqDoc = db.collection("album").doc(reg.params.id);
+      const userDetail = await reqDoc.get();
+      const response = userDetail.data();
+      return res.status(200).send({status: "sucess", data: response});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+app.get("/api/album/getALL", (reg, res) => {
+  (async () => {
+    try {
+      const query = db.collection("album");
+      const response = [];
+      await query.get().then((data) => {
+        const docs = data.docs;
+        docs.map((doc) => {
+          const selectionItem = {
+            idAlbum: doc.data().idAlbum,
+            nameAlbum: doc.data().nameAlbum,
+            ImgAlbum: doc.data().ImgAlbum,
+          };
+
+          response.push(selectionItem);
+        });
+        return response;
+      });
+      return res.status(200).send({status: "sucess", data: response});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+// update -> put()
+app.put("/api/album/update/:id", (reg, res) => {
+  (async () => {
+    try {
+      const reqDoc = db.collection("album").doc(reg.params.id);
+      await reqDoc.update({
+        nameAlbum: reg.body.nameAlbum,
+        ImgAlbum: reg.body.ImgAlbum,
+      });
+      return res.status(200).send({status: "sucess", msg: "Album Data Update"});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+// delete -> delete()
+app.delete("/api/album/delete/:id", (reg, res) => {
+  (async () => {
+    try {
+      const reqDoc = db.collection("album").doc(reg.params.id);
+      await reqDoc.delete();
+      return res.status(200).send({status: "sucess", msg: "Data Delete"});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+// ----------------------------------------------------------------
+// Thể loại categrỏy
+
+
+app.get("/category", (reg, res) => {
+  return res.status(200).send("Hello Category");
+});
+app.post("/api/category/create", (reg, res) => {
+  (async () => {
+    try {
+      await db.collection("category").doc(`/${Date.now()}/`).create({
+        idCategory: Date.now(),
+        idTopic: reg.body.idTopic,
+        nameCategory: reg.body.nameCategory,
+        imgCategory: reg.body.imgCategory,
+      });
+      return res.status(200).send({status: "sucess", msg: "Data Saved Category"});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+// get -> get()
+app.get("/api/category/get/:id", (reg, res) => {
+  (async () => {
+    try {
+      const reqDoc = db.collection("category").doc(reg.params.id);
+      const userDetail = await reqDoc.get();
+      const response = userDetail.data();
+      return res.status(200).send({status: "sucess", data: response});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+app.get("/api/category/getALL", (reg, res) => {
+  (async () => {
+    try {
+      const query = db.collection("category");
+      const response = [];
+      await query.get().then((data) => {
+        const docs = data.docs;
+        docs.map((doc) => {
+          const selectionItem = {
+            idCategory: doc.data().idCategory,
+            idTopic: doc.data().idTopic,
+            nameCategory: doc.data().nameCategory,
+            imgCategory: doc.data().imgCategory,
+          };
+
+          response.push(selectionItem);
+        });
+        return response;
+      });
+      return res.status(200).send({status: "sucess", data: response});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+// update -> put()
+app.put("/api/category/update/:id", (reg, res) => {
+  (async () => {
+    try {
+      const reqDoc = db.collection("category").doc(reg.params.id);
+      await reqDoc.update({
+        idTopic: reg.body.idTopic,
+        nameCategory: reg.body.nameCategory,
+        imgCategory: reg.body.imgCategory,
+      });
+      return res.status(200).send({status: "sucess", msg: "Category Data Update"});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+// delete -> delete()
+app.delete("/api/category/delete/:id", (reg, res) => {
+  (async () => {
+    try {
+      const reqDoc = db.collection("category").doc(reg.params.id);
+      await reqDoc.delete();
+      return res.status(200).send({status: "sucess", msg: "Data Delete"});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+// ----------------------------------------------------------------
+// Topic
+
+app.get("/topic", (reg, res) => {
+  return res.status(200).send("Hello Topic");
+});
+
+app.post("/api/topic/create", (reg, res) => {
+  (async () => {
+    try {
+      await db.collection("topic").doc(`/${Date.now()}/`).create({
+        idTopic: Date.now(),
+        nameTopic: reg.body.nameTopic,
+      });
+      return res.status(200).send({status: "sucess", msg: "Data Saved Topic"});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+// get -> get()
+app.get("/api/topic/get/:id", (reg, res) => {
+  (async () => {
+    try {
+      const reqDoc = db.collection("topic").doc(reg.params.id);
+      const userDetail = await reqDoc.get();
+      const response = userDetail.data();
+      return res.status(200).send({status: "sucess", data: response});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+app.get("/api/topic/getALL", (reg, res) => {
+  (async () => {
+    try {
+      const query = db.collection("topic");
+      const response = [];
+      await query.get().then((data) => {
+        const docs = data.docs;
+        docs.map((doc) => {
+          const selectionItem = {
+            idTopic: doc.data().idTopic,
+            nameTopic: doc.data().nameTopic,
+          };
+
+          response.push(selectionItem);
+        });
+        return response;
+      });
+      return res.status(200).send({status: "sucess", data: response});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+// update -> put()
+app.put("/api/topic/update/:id", (reg, res) => {
+  (async () => {
+    try {
+      const reqDoc = db.collection("topic").doc(reg.params.id);
+      await reqDoc.update({
+        nameTopic: reg.body.nameTopic,
+      });
+      return res.status(200).send({status: "sucess", msg: "Topic Data Update"});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+// delete -> delete()
+app.delete("/api/topic/delete/:id", (reg, res) => {
+  (async () => {
+    try {
+      const reqDoc = db.collection("topic").doc(reg.params.id);
+      await reqDoc.delete();
+      return res.status(200).send({status: "sucess", msg: "Data Delete"});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+// ----------------------------------------------------------------
+// Singer
+
+app.get("/singer", (reg, res) => {
+  return res.status(200).send("Hello Singers");
+});
+app.post("/api/singer/create", (reg, res) => {
+  (async () => {
+    try {
+      await db.collection("singer").doc(`/${Date.now()}/`).create({
+        idSinger: Date.now(),
+        nameSinger: reg.body.nameSinger,
+        imgSinger: reg.body.imgSinger,
+      });
+      return res.status(200).send({status: "sucess", msg: "Data Saved Category"});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+// get -> get()
+app.get("/api/singer/get/:id", (reg, res) => {
+  (async () => {
+    try {
+      const reqDoc = db.collection("singer").doc(reg.params.id);
+      const userDetail = await reqDoc.get();
+      const response = userDetail.data();
+      return res.status(200).send({status: "sucess", data: response});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+app.get("/api/singer/getALL", (reg, res) => {
+  (async () => {
+    try {
+      const query = db.collection("singer");
+      const response = [];
+      await query.get().then((data) => {
+        const docs = data.docs;
+        docs.map((doc) => {
+          const selectionItem = {
+            idSinger: doc.data().idSinger,
+            nameSinger: doc.data().nameSinger,
+            imgSinger: doc.data().imgSinger,
+          };
+
+          response.push(selectionItem);
+        });
+        return response;
+      });
+      return res.status(200).send({status: "sucess", data: response});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+// update -> put()
+app.put("/api/singer/update/:id", (reg, res) => {
+  (async () => {
+    try {
+      const reqDoc = db.collection("singer").doc(reg.params.id);
+      await reqDoc.update({
+        idSinger: reg.body.idSinger,
+        nameSinger: reg.body.nameSinger,
+        imgSinger: reg.body.imgSinger,
+      });
+      return res.status(200).send({status: "sucess", msg: "Singer Data Update"});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+// delete -> delete()
+app.delete("/api/singer/delete/:id", (reg, res) => {
+  (async () => {
+    try {
+      const reqDoc = db.collection("singer").doc(reg.params.id);
+      await reqDoc.delete();
+      return res.status(200).send({status: "sucess", msg: "Data Delete"});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+// ----------------------------------------------------------------
+// love song
+app.get("/lovesong", (reg, res) => {
+  return res.status(200).send("Bài Hát yêu Thích!");
+});
+app.post("/api/lovesong/create", (reg, res) => {
+  (async () => {
+    try {
+      await db.collection("lovesong").doc(`/${Date.now()}/`).create({
+        idUser: reg.body.idUser,
+        idSinger: reg.body.idSinger,
+      });
+      return res.status(200).send({status: "sucess", msg: "Data Saved lovesong"});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+// get -> get()
+app.get("/api/lovesong/get/:id", (reg, res) => {
+  (async () => {
+    try {
+      const reqDoc = db.collection("lovesong").doc(reg.params.id);
+      const userDetail = await reqDoc.get();
+      const response = userDetail.data();
+      return res.status(200).send({status: "sucess", data: response});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+app.get("/api/lovesong/getALL", (reg, res) => {
+  (async () => {
+    try {
+      const query = db.collection("lovesong");
+      const response = [];
+      await query.get().then((data) => {
+        const docs = data.docs;
+        docs.map((doc) => {
+          const selectionItem = {
+            idUser: doc.data().idUser,
+            idSong: doc.data().idSong,
+          };
+
+          response.push(selectionItem);
+        });
+        return response;
+      });
+      return res.status(200).send({status: "sucess", data: response});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+
+// update -> put()
+app.put("/api/lovesong/update/:id", (reg, res) => {
+  (async () => {
+    try {
+      const reqDoc = db.collection("lovesong").doc(reg.params.id);
+      await reqDoc.update({
+        idUser: reg.body.idUser,
+        idSong: reg.body.idSong,
+      });
+      return res.status(200).send({status: "sucess", msg: "Singer Data Update"});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({status: "False", msg: error});
+    }
+  })();
+});
+// delete -> delete()
+app.delete("/api/lovesong/delete/:id", (reg, res) => {
+  (async () => {
+    try {
+      const reqDoc = db.collection("lovesong").doc(reg.params.id);
       await reqDoc.delete();
       return res.status(200).send({status: "sucess", msg: "Data Delete"});
     } catch (error) {
